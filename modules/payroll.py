@@ -1,120 +1,75 @@
-"""Payroll lite — generate and view payslips."""
+"""Payroll module for Kazeyami HRM."""
 from __future__ import annotations
 
-from datetime import date
 from flask import Blueprint, flash, redirect, render_template, request, url_for
 
-from helpers import can_manage, current_user, full_name, login_required, roles_required
-from models import execute, query, row_to_dict, rows_to_dicts
+from helpers import can_manage, current_user, login_required, roles_required, audit
+from models import execute, query
 
-bp = Blueprint("payroll", __name__)
-
-
-@bp.route("/payroll")
-@bp.route("/payslips")
-@login_required
-def payslips_page():
-    user = current_user()
-    year = request.args.get("year", type=int) or date.today().year
-    month = request.args.get("month", type=int) or date.today().month
-
-    if can_manage(user):
-        rows = query(
-            """SELECT p.*, e.first_name, e.last_name, e.emp_code
-               FROM payslips p
-               JOIN employees e ON e.id = p.employee_id
-               WHERE p.year = ? AND p.month = ?
-               ORDER BY e.first_name""",
-            (year, month),
-        )
-    else:
-        emp = query("SELECT id FROM employees WHERE user_id = ?", (user["id"],), one=True)
-        if not emp:
-            rows = []
-        else:
-            rows = query(
-                """SELECT p.*, e.first_name, e.last_name, e.emp_code
-                   FROM payslips p
-                   JOIN employees e ON e.id = p.employee_id
-                   WHERE p.employee_id = ? AND p.year = ? AND p.month = ?""",
-                (emp["id"], year, month),
-            )
-
-    return render_template(
-        "payroll/index.html",
-        payslips=rows_to_dicts(rows),
-        year=year,
-        month=month,
-        can_manage=can_manage(user),
-    )
+bp = Blueprint("payroll", __name__, url_prefix="/payroll")
 
 
-@bp.route("/payroll/<int:pid>")
-@login_required
-def payslip_view(pid):
-    user = current_user()
-    row = query(
-        """SELECT p.*, e.first_name, e.last_name, e.emp_code, e.basic_salary,
-                  d.name AS dept_name
-           FROM payslips p
-           JOIN employees e ON e.id = p.employee_id
-           LEFT JOIN departments d ON d.id = e.department_id
-           WHERE p.id = ?""",
-        (pid,),
-        one=True,
-    )
-    if not row:
-        flash("Payslip not found.", "error")
-        return redirect(url_for("payroll.payslips_page"))
-    if not can_manage(user):
-        emp = query("SELECT id FROM employees WHERE user_id = ?", (user["id"],), one=True)
-        if not emp or emp["id"] != row["employee_id"]:
-            flash("Access denied.", "error")
-            return redirect(url_for("payroll.payslips_page"))
-    return render_template("payroll/payslip.html", p=row_to_dict(row), print_mode=False)
+def register(app):
+    app.register_blueprint(bp)
 
 
-@bp.route("/payroll/<int:pid>/print")
-@login_required
-def payslip_print(pid):
-    user = current_user()
-    row = query(
-        """SELECT p.*, e.first_name, e.last_name, e.emp_code, e.basic_salary,
-                  d.name AS dept_name
-           FROM payslips p
-           JOIN employees e ON e.id = p.employee_id
-           LEFT JOIN departments d ON d.id = e.department_id
-           WHERE p.id = ?""",
-        (pid,),
-        one=True,
-    )
-    if not row:
-        flash("Payslip not found.", "error")
-        return redirect(url_for("payroll.payslips_page"))
-    if not can_manage(user):
-        emp = query("SELECT id FROM employees WHERE user_id = ?", (user["id"],), one=True)
-        if not emp or emp["id"] != row["employee_id"]:
-            flash("Access denied.", "error")
-            return redirect(url_for("payroll.payslips_page"))
-    return render_template("payroll/payslip.html", p=row_to_dict(row), print_mode=True)
-
-
-@bp.route("/payroll/generate", methods=["POST"])
+@bp.route("/")
 @login_required
 @roles_required("admin", "hr")
-def payslip_generate():
-    from helpers import generate_payslip
+ def index():
+    runs = query("SELECT * FROM payroll_runs ORDER BY period_start DESC")
+    return render_template("payroll/index.html", runs=runs)
 
-    year = int(request.form.get("year") or date.today().year)
-    month = int(request.form.get("month") or date.today().month)
-    emp_id = request.form.get("employee_id")
 
-    if emp_id:
-        generate_payslip(int(emp_id), year, month)
-        flash("Payslip generated.", "ok")
-    else:
-        emps = query("SELECT id FROM employees WHERE status = 'active'")
-        for e in emps:
-            generate_payslip(e["id"], year, month)
-        flash(f"Generated payslips for {len(emps)} employees.", "ok")
-    return redirect(url_for("payroll.payslips_page", year=year, month=month))
+@bp.route("/run", methods=["POST"])
+@login_required
+@roles_required("admin", "hr")
+ def create_run():
+    start = request.form.get("period_start")
+    end = request.form.get("period_end")
+    if not start or not end:
+        flash("Period required", "error")
+        return redirect(url_for("payroll.index"))
+    execute(
+        "INSERT INTO payroll_runs (period_start, period_end, status) VALUES (?,?, 'draft')",
+        (start, end),
+    )
+    run_id = query("SELECT last_insert_rowid() AS id", one=True)["id"]
+    emps = query("SELECT * FROM employees WHERE is_active=1")
+    for e in emps:
+        basic = float(e.get("basic_salary") or 0)
+        # simple OT placeholder
+        ot = 0.0
+        deductions = round(basic * 0.05, 2)  # placeholder CPF-like
+        net = basic + ot - deductions
+        execute(
+            """INSERT INTO payslips (run_id, employee_id, basic, allowances, overtime, deductions, net)
+               VALUES (?,?,?,?,?,?,?)""",
+            (run_id, e["id"], basic, 0, ot, deductions, net),
+        )
+    audit("payroll_run", f"Run {run_id} {start} to {end}")
+    flash("Payroll run created", "success")
+    return redirect(url_for("payroll.index"))
+
+
+@bp.route("/payslip/<int:slip_id>")
+@login_required
+ def payslip(slip_id):
+    slip = query(
+        """SELECT p.*, e.first_name, e.last_name, e.emp_code, e.job_title,
+                  r.period_start, r.period_end
+           FROM payslips p
+           JOIN employees e ON e.id = p.employee_id
+           JOIN payroll_runs r ON r.id = p.run_id
+           WHERE p.id = ?""",
+        (slip_id,),
+        one=True,
+    )
+    if not slip:
+        flash("Not found", "error")
+        return redirect(url_for("dashboard"))
+    user = current_user()
+    if not can_manage(user) and user["employee_id"] != slip["employee_id"]:
+        flash("Access denied", "error")
+        return redirect(url_for("dashboard"))
+    return render_template("payroll/payslip.html", slip=slip)

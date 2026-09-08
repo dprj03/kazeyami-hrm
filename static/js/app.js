@@ -1,6 +1,6 @@
-/* Kazeyami People OS — light client helpers */
-document.querySelectorAll("[data-confirm]").forEach((el) => {
-  el.addEventListener("click", (e) => {
-    if (!confirm(el.getAttribute("data-confirm") || "Are you sure?")) e.preventDefault();
+document.addEventListener('DOMContentLoaded', () => {
+  // flash auto-dismiss
+  document.querySelectorAll('.flash').forEach(el => {
+    setTimeout(() => el.classList.add('fade-out'), 4000);
   });
 });
