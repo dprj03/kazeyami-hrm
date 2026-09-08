@@ -1,60 +1,59 @@
-# Kazeyami Innovations — People OS
+# Kazeyami Innovations — Human Resource & Attendance OS
 
-Human resource management and attendance for **Kazeyami Innovations Pte. Ltd.**  
-Singapore HQ · Asia/Singapore.
-
-A single Flask app with a SQLite database, distinctive paper-and-ink interface, and seeded demo data so the workspace is alive on first launch.
-
-## Features
-
-- Role-based access: Admin, HR, Manager, Employee
-- Employee directory, profiles, departments and designations
-- Web clock-in / clock-out with late, overtime and half-day rules
-- Monthly attendance sheet and CSV export
-- Shifts and holiday calendar
-- Leave types, balances, apply / approve / reject / cancel, leave calendar
-- Payroll lite — generate and print payslips
-- Reports: attendance, leave utilisation, headcount, late arrivals + CSV
-- Announcements, notifications, company settings, user roles, audit log
+A complete, self-contained People / HR / Attendance system built with Flask, Jinja2 and SQLite.
+Distinctive paper-and-ink UI (Instrument Serif + Figtree).
 
 ## Quick start
 
 ```bash
-cd kazeyami-hrm
-python3 -m pip install -r requirements.txt
+python3 -m venv .venv
+source .venv/bin/activate   # Windows: .venv\\Scripts\\activate
+pip install -r requirements.txt
 python3 app.py
 ```
 
-Open [http://127.0.0.1:5050](http://127.0.0.1:5050).
+Open http://127.0.0.1:5050
 
-The database `kazeyami.db` is created and seeded automatically on first run.
+Database is created and seeded automatically on first launch.
+Override path with `KAZEYAMI_DB=/path/to/file.db`.
 
 ## Demo accounts
 
-| Role     | Email                   | Password     |
-|----------|-------------------------|--------------|
-| Admin    | admin@kazeyami.com      | Admin@123    |
-| HR       | hr@kazeyami.com         | Hr@12345     |
-| Manager  | manager@kazeyami.com    | Manager@123  |
-| Employee | employee@kazeyami.com   | Employee@123 |
+| Role     | Email                 | Password     |
+|----------|-----------------------|--------------|
+| Admin    | admin@kazeyami.com    | Admin@123    |
+| HR       | hr@kazeyami.com       | Hr@12345     |
+| Manager  | manager@kazeyami.com  | Manager@123  |
+| Employee | employee@kazeyami.com | Employee@123 |
 
-Other seeded people sign in with their work email and `Welcome@123`.
+## Features
 
-## Layout
+- Authentication & role-based access (Admin / HR / Manager / Employee)
+- Employee directory, profiles, departments, shifts
+- Daily attendance clock-in / clock-out, attendance sheet, late & OT rules
+- Leave requests, approvals, balance, calendar
+- Payroll runs, payslips, basic statutory deductions
+- Reports & analytics
+- Announcements, notifications, audit log
+- Company settings, holidays, users management
+
+## Stack
+
+- Python 3.10+
+- Flask + Jinja2
+- SQLite (WAL mode, retry-hardened)
+- Vanilla JS + custom CSS (no heavy frontend framework)
+
+## Project layout
 
 ```
-app.py              Flask app, auth, employees, org, settings
-models.py           SQLite schema and helpers
-seed.py             Kazeyami demo dataset
-helpers.py          Attendance math, payroll, auth decorators
-modules/            Attendance, leave, payroll, reports
-templates/          Jinja pages
-static/css/app.css  Kazeyami design system
+app.py          # Application factory & routes
+helpers.py      # Auth, utilities, audit
+models.py       # DB layer
+seed.py         # Demo data
+modules/        # attendance, leave, payroll, reports
+static/         # css, js
+templates/      # Jinja templates
 ```
 
-## Policy defaults
-
-- Core shift 09:00–18:00, 10 minute grace
-- Saturday and Sunday are week-offs
-- Singapore public holidays for 2026 plus company days
-- Unpaid leave prorates basic salary on generated payslips
+Built for Kazeyami Innovations.
