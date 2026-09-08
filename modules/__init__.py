@@ -1,1 +1,1 @@
-"""Kazeyami HRM modules."""
+"""Feature modules for attendance, leave, payroll and reports."""
