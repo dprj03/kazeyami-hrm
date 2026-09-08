@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block title %}Users · Kazeyami{% endblock %}
+{% block content %}
+<div class="page-head">
+  <div>
+    <h1>Users</h1>
+    <p class="muted">Roles & access</p>
+  </div>
+</div>
+<div class="card">
+  <table class="table">
+    <thead>
+      <tr><th>Name</th><th>Email</th><th>Role</th><th></th></tr>
+    </thead>
+    <tbody>
+      {% for u in users %}
+      <tr>
+        <td>{{ u.first_name or '' }} {{ u.last_name or '' }} <span class="mono muted">{{ u.emp_code or '' }}</span></td>
+        <td>{{ u.email }}</td>
+        <td><span class="badge">{{ u.role }}</span></td>
+        <td>
+          <form method="post" class="inline">
+            <input type="hidden" name="user_id" value="{{ u.id }}">
+            <select name="role" onchange="this.form.submit()">
+              {% for r in ['admin','hr','manager','employee'] %}
+              <option value="{{ r }}" {% if u.role == r %}selected{% endif %}>{{ r }}</option>
+              {% endfor %}
+            </select>
+          </form>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

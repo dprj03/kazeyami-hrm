@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block title %}Announcements · Kazeyami{% endblock %}
+{% block content %}
+<div class="page-head">
+  <div>
+    <h1>Announcements</h1>
+    <p class="muted">Company-wide updates</p>
+  </div>
+</div>
+{% if session.get('role') in ['admin','hr','manager'] %}
+<div class="card" style="margin-bottom:1.5rem">
+  <form method="post" class="stack">
+    <label><span>Title</span><input name="title" required></label>
+    <label><span>Body</span><textarea name="body" rows="3" required></textarea></label>
+    <button class="btn btn-primary" type="submit">Publish</button>
+  </form>
+</div>
+{% endif %}
+<div class="stack">
+  {% for a in announcements %}
+  <div class="card">
+    <h3>{{ a.title }}</h3>
+    <p class="muted mono">{{ a.created_at }} · {{ a.author or 'System' }}</p>
+    <p>{{ a.body }}</p>
+  </div>
+  {% else %}
+  <p class="muted">No announcements yet.</p>
+  {% endfor %}
+</div>
+{% endblock %}

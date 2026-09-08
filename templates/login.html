@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Sign in · Kazeyami HRM</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/app.css') }}">
+</head>
+<body class="login-body">
+  <div class="login-card">
+    <div class="login-brand">
+      <div class="mark">K</div>
+      <div>
+        <div class="brand-name">Kazeyami</div>
+        <div class="brand-sub">Innovations · People OS</div>
+      </div>
+    </div>
+    <h1>Welcome back</h1>
+    <p class="muted">Sign in with your work email</p>
+    {% if error %}
+    <div class="flash flash-error">{{ error }}</div>
+    {% endif %}
+    <form method="post" class="stack">
+      <label>
+        <span>Email</span>
+        <input type="email" name="email" required autofocus placeholder="you@kazeyami.com">
+      </label>
+      <label>
+        <span>Password</span>
+        <input type="password" name="password" required placeholder="••••••••">
+      </label>
+      <button type="submit" class="btn btn-primary btn-block">Sign in</button>
+    </form>
+    <p class="demo-hint">Demo: admin@kazeyami.com / Admin@123</p>
+  </div>
+</body>
+</html>

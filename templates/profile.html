@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block title %}Profile · Kazeyami{% endblock %}
+{% block content %}
+<div class="page-head">
+  <div>
+    <h1>Your profile</h1>
+    <p class="muted">Account settings</p>
+  </div>
+</div>
+<div class="card" style="max-width:480px">
+  <form method="post" class="stack">
+    <h3>Change password</h3>
+    <label>
+      <span>Current password</span>
+      <input type="password" name="current_password">
+    </label>
+    <label>
+      <span>New password</span>
+      <input type="password" name="new_password">
+    </label>
+    <button type="submit" class="btn btn-primary">Update password</button>
+  </form>
+</div>
+{% endblock %}
