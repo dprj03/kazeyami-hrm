@@ -1,0 +1,168 @@
+/* Kazeyami paper/ink design system — Instrument Serif + Figtree */
+:root {
+  --ink: #1a1a1a;
+  --paper: #f7f4ef;
+  --muted: #6b6560;
+  --line: #e5e0d8;
+  --accent: #2c4a3e;
+  --accent-soft: #e8f0ec;
+  --warn: #9a6b2f;
+  --danger: #8b3a3a;
+  --ok: #2f6b4f;
+  --serif: "Instrument Serif", Georgia, serif;
+  --sans: "Figtree", system-ui, sans-serif;
+  --radius: 10px;
+  --shadow: 0 1px 2px rgba(26,26,26,0.04), 0 8px 24px rgba(26,26,26,0.06);
+}
+
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; }
+body {
+  font-family: var(--sans);
+  background: var(--paper);
+  color: var(--ink);
+  line-height: 1.5;
+  min-height: 100vh;
+}
+a { color: var(--accent); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+.shell { display: flex; min-height: 100vh; }
+.sidebar {
+  width: 240px;
+  background: #fff;
+  border-right: 1px solid var(--line);
+  padding: 1.25rem 1rem;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow-y: auto;
+}
+.brand {
+  font-family: var(--serif);
+  font-size: 1.35rem;
+  letter-spacing: -0.02em;
+  margin: 0 0 0.25rem;
+}
+.brand-sub { font-size: 0.75rem; color: var(--muted); margin-bottom: 1.5rem; }
+nav a {
+  display: block;
+  padding: 0.45rem 0.65rem;
+  border-radius: 8px;
+  color: var(--ink);
+  margin-bottom: 2px;
+  font-size: 0.92rem;
+}
+nav a:hover, nav a.active {
+  background: var(--accent-soft);
+  color: var(--accent);
+  text-decoration: none;
+}
+.main { flex: 1; padding: 1.5rem 2rem 3rem; max-width: 1200px; }
+.topbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  gap: 1rem;
+}
+h1, h2, h3 { font-family: var(--serif); font-weight: 400; letter-spacing: -0.02em; margin: 0 0 0.75rem; }
+h1 { font-size: 1.85rem; }
+h2 { font-size: 1.35rem; }
+.card {
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 1.1rem 1.25rem;
+  box-shadow: var(--shadow);
+  margin-bottom: 1rem;
+}
+.grid { display: grid; gap: 1rem; }
+.grid-2 { grid-template-columns: repeat(2, 1fr); }
+.grid-3 { grid-template-columns: repeat(3, 1fr); }
+.grid-4 { grid-template-columns: repeat(4, 1fr); }
+@media (max-width: 900px) {
+  .shell { flex-direction: column; }
+  .sidebar { width: 100%; height: auto; position: relative; }
+  .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; }
+}
+.stat { font-family: var(--serif); font-size: 1.75rem; }
+.muted { color: var(--muted); font-size: 0.88rem; }
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  border: 1px solid var(--line);
+  background: #fff;
+  color: var(--ink);
+  padding: 0.45rem 0.9rem;
+  border-radius: 8px;
+  font: inherit;
+  font-size: 0.9rem;
+  cursor: pointer;
+}
+.btn:hover { background: var(--paper); }
+.btn-primary {
+  background: var(--accent);
+  color: #fff;
+  border-color: var(--accent);
+}
+.btn-primary:hover { filter: brightness(1.05); background: var(--accent); color: #fff; }
+.btn-danger { background: var(--danger); color: #fff; border-color: var(--danger); }
+table { width: 100%; border-collapse: collapse; font-size: 0.92rem; }
+th, td { text-align: left; padding: 0.55rem 0.65rem; border-bottom: 1px solid var(--line); }
+th { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.04em; color: var(--muted); font-weight: 600; }
+form label { display: block; font-size: 0.82rem; color: var(--muted); margin-bottom: 0.25rem; }
+input, select, textarea {
+  width: 100%;
+  padding: 0.5rem 0.65rem;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  font: inherit;
+  background: #fff;
+}
+.form-row { margin-bottom: 0.85rem; }
+.flash {
+  padding: 0.65rem 0.9rem;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+  background: var(--accent-soft);
+  border: 1px solid #c5d9ce;
+}
+.badge {
+  display: inline-block;
+  padding: 0.15rem 0.5rem;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  background: var(--accent-soft);
+  color: var(--accent);
+}
+.badge-warn { background: #f5e8d4; color: var(--warn); }
+.badge-danger { background: #f0dede; color: var(--danger); }
+.badge-ok { background: #dceee4; color: var(--ok); }
+.login-wrap {
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: 2rem;
+}
+.login-card {
+  width: 100%;
+  max-width: 380px;
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 2rem;
+  box-shadow: var(--shadow);
+}
+.clock-panel {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  align-items: center;
+}
+.clock-time {
+  font-family: var(--serif);
+  font-size: 2.5rem;
+  letter-spacing: -0.03em;
+}
