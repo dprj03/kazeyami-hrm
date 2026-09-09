@@ -1,6 +1,4 @@
-document.addEventListener('DOMContentLoaded', () => {
-  // flash auto-dismiss
-  document.querySelectorAll('.flash').forEach(el => {
-    setTimeout(() => el.classList.add('fade-out'), 4000);
-  });
+document.addEventListener('submit', function(e){
+  const btn = e.target.querySelector('button[type=submit]');
+  if(btn){ btn.dataset.label = btn.textContent; }
 });
