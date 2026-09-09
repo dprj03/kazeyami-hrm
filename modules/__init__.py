@@ -1,4 +1,7 @@
-"""Feature modules for Kazeyami HRM."""
-from . import attendance, leave, payroll, reports
+"""Kazeyami HRM modules."""
 
-__all__ = ["attendance", "leave", "payroll", "reports"]
+from modules.leave import register as register_leave
+from modules.payroll import register as register_payroll
+from modules.reports import register as register_reports
+
+__all__ = ["register_leave", "register_payroll", "register_reports"]
